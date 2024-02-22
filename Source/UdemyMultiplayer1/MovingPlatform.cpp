@@ -3,6 +3,7 @@
 
 #include "MovingPlatform.h"
 
+
 AMovingPlatform::AMovingPlatform()
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -15,16 +16,38 @@ AMovingPlatform::AMovingPlatform()
 void AMovingPlatform::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
-	
 
-	if (HasAuthority())
+	if (HasAuthority() && ActiveTriggers > 0)
 	{
-		Location += FVector(Speed * DeltaSeconds,0,0);
+		Location = GetActorLocation();
+		float JourneyLength = (GlobalTargetLocation - GlobalStartLocation).Size();
+		float JourneyTraveled = (Location - GlobalStartLocation).Size();
+		if (JourneyTraveled > JourneyLength)
+		{
+			FVector Swap = GlobalStartLocation;
+			GlobalStartLocation = Location;
+			GlobalTargetLocation = Swap;
+		}
+		FVector Direction = (GlobalTargetLocation - GlobalStartLocation).GetSafeNormal();
+		Location += Speed * DeltaSeconds * Direction;
 		SetActorLocation(Location);
 	}
 	
 }
 
+
+void AMovingPlatform::AddActiveTrigger()
+{
+	ActiveTriggers++;
+}
+
+void AMovingPlatform::RemoveActiveTrigger()
+{
+	ActiveTriggers--;
+	int Clamp = FMath::Clamp(ActiveTriggers,0,INT_MAX);
+	ActiveTriggers = Clamp;
+	
+}
 
 void AMovingPlatform::BeginPlay()
 {
@@ -35,6 +58,9 @@ void AMovingPlatform::BeginPlay()
 		SetReplicates(true);
 		SetReplicateMovement(true);
 	}
+
+	GlobalStartLocation = GetActorLocation();
+	GlobalTargetLocation = GetTransform().TransformPosition(TargetLocation);
 	
 }
 

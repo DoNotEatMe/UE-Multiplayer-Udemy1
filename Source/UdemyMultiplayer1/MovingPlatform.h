@@ -9,6 +9,7 @@
 /**
  * 
  */
+
 UCLASS()
 class UDEMYMULTIPLAYER1_API AMovingPlatform : public AStaticMeshActor
 {
@@ -21,9 +22,26 @@ class UDEMYMULTIPLAYER1_API AMovingPlatform : public AStaticMeshActor
 	UPROPERTY(EditAnywhere)	
 	FVector Location;
 
+	UPROPERTY(EditAnywhere, Meta = (MakeEditWidget = true))
+	FVector TargetLocation;
+
 	UPROPERTY(EditAnywhere)
 	float Speed = 20.f;
+
+	void AddActiveTrigger();
+	void RemoveActiveTrigger();
+
+private:
+
+	FVector GlobalTargetLocation;
+	FVector GlobalStartLocation;
+
+	UPROPERTY(EditAnywhere)
+	int ActiveTriggers = 1;
+
 	
+
+		
 
 protected:
 	virtual void BeginPlay() override;
