@@ -24,4 +24,5 @@ class UDEMYMULTIPLAYER1_API UPuzzlePlatformsGameInstance : public UGameInstance
 	UFUNCTION(Exec)
 	void Join(const FString& Address);
 	
+	
 };
